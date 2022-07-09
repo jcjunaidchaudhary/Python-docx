@@ -1,5 +1,5 @@
+from pydoc import doc
 from docx import Document
-from docx.enum.style import WD_STYLE_TYPE 
 from docx.shared import Pt, RGBColor, Inches
 from docx.oxml.xmlchemy import OxmlElement
 from docx.oxml.ns import qn
@@ -8,7 +8,7 @@ from docx.enum.section import WD_SECTION
 
 document = Document()
 
-# create section
+# Formating all sections
 sections = document.sections
 for section in sections:
     section.top_margin = Inches(0.3)
@@ -16,12 +16,9 @@ for section in sections:
     section.left_margin = Inches(0.3)
     section.right_margin = Inches(0.3)
 
-section = document.sections[0]
-# section.start_type = WD_SECTION.NEW_PAGE
-
 
 #function for Fontstyle
-def fontstyle(paragraph, font_name = 'Times New Roman', font_size = 12, font_bold = True, font_italic = False, font_underline = False):
+def fontstyle(paragraph, font_name = 'Times New Roman', font_size = 14, font_bold = True, font_italic = False, font_underline = False):
     font = paragraph.style.font
     font.name = font_name
     font.size = Pt(font_size)
@@ -116,20 +113,22 @@ def add_page_number(paragraph):
     num_pages_run._r.append(fldChar4)
 
 
-# Header
-header = document.sections[0].header
+#craeting first section for header
+section = document.sections[0]
+sectPr = section._sectPr
+cols = sectPr.xpath('./w:cols')[0]
+cols.set(qn('w:num'), '1')
 
-paragraph = header.paragraphs[0]
-paragraph.text = "Radiance Academy"
+paragraph=document.add_heading("Radiance Academy")
 paragraph.alignment=1
-fontstyle(paragraph, font_size=25,font_underline=True)
+fontstyle(paragraph, font_size=28,font_underline=True)
 
 #header table
-htable=header.add_table(1,3, Inches(8))
+htable=document.add_table(1,3)
 
 htab_cells=htable.rows[0].cells
 ht0=htab_cells[0].add_paragraph("Exam : Neet\nDate : 12/2/22")
-fontstyle(ht0)
+# fontstyle(ht0)
 ht0.alignment = 0
 
 ht1=htab_cells[1].add_paragraph('Mock Test\nNEET')
@@ -139,12 +138,11 @@ ht2=htab_cells[2].add_paragraph("Marks : 720\nTime : 3 hour")
 ht2.alignment = 2
 
 
-header.first_page_header =True
-header.is_linked_to_previous = False
-
+#creating a main section
+main_section = document.add_section(0)
 
 #creating two column in page
-sectPr = section._sectPr
+sectPr = main_section._sectPr
 cols = sectPr.xpath('./w:cols')[0]
 cols.set(qn('w:num'), '2')
 
@@ -451,12 +449,13 @@ add_page_number(document.sections[0].footer.paragraphs[0])
 #add new section
 new_section = document.add_section(0)
 # new_section.start_type=WD_SECTION.NEW_PAGE
-sectPr2 = new_section._sectPr
-cols2 = sectPr2.xpath('./w:cols')[0]
-cols2.set(qn('w:num'), '1')
+sectPr = new_section._sectPr
+cols = sectPr.xpath('./w:cols')[0]
+cols.set(qn('w:num'), '1')
 
 endpara=document.add_paragraph("--------------Best of Luck---------------")
+fontstyle(endpara)
 endpara.alignment=1
 
-document.save('Final.docx')
+document.save('FinalWithoutHeader.docx')
 
