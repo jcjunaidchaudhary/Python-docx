@@ -11,7 +11,8 @@ document = Document()
 # Formating all sections
 sections = document.sections
 for section in sections:
-    section.top_margin = Inches(0.3)
+    section.footer_distance=Inches(0.15)
+    section.top_margin = Inches(0)
     section.bottom_margin = Inches(0.3)
     section.left_margin = Inches(0.3)
     section.right_margin = Inches(0.3)
@@ -127,6 +128,7 @@ fontstyle(paragraph, font_size=28,font_underline=True)
 htable=document.add_table(1,3)
 
 htab_cells=htable.rows[0].cells
+
 ht0=htab_cells[0].add_paragraph("Exam : Neet\nDate : 12/2/22")
 # fontstyle(ht0)
 ht0.alignment = 0
@@ -137,9 +139,12 @@ ht1.alignment = 1
 ht2=htab_cells[2].add_paragraph("Marks : 720\nTime : 3 hour")
 ht2.alignment = 2
 
+line=document.add_paragraph("_________________________________________________________________________________")
 
 #creating a main section
 main_section = document.add_section(0)
+main_section.top_margin=Inches(0.3)
+main_section.is_linked_to_previous=False
 
 #creating two column in page
 sectPr = main_section._sectPr
@@ -444,7 +449,8 @@ for i in lst:
     writedocx(sentence+"\n")
 
 # Calling for Page number in foooter
-add_page_number(document.sections[0].footer.paragraphs[0])
+footer=document.sections[0]
+add_page_number(footer.footer.paragraphs[0])
 
 #add new section
 new_section = document.add_section(0)
@@ -453,7 +459,7 @@ sectPr = new_section._sectPr
 cols = sectPr.xpath('./w:cols')[0]
 cols.set(qn('w:num'), '1')
 
-endpara=document.add_paragraph("--------------Best of Luck---------------")
+endpara=document.add_paragraph("---------------Best of Luck---------------")
 fontstyle(endpara)
 endpara.alignment=1
 
