@@ -46,7 +46,9 @@ ht2.alignment = 2
 
 sectPr = section._sectPr
 cols = sectPr.xpath('./w:cols')[0]
-cols.set(qn('w:num'), '2')
+a=cols.set(qn('w:num'), '2')
+for i in cols:
+    print(i)
 
 def writedocx(content, font_name = 'Times New Roman', font_size = 12, font_bold = False, font_italic = False, font_underline = False, color = RGBColor(0, 0, 0),
               before_spacing = 2, after_spacing = 2, line_spacing = 1.5, keep_together = True, keep_with_next = False, page_break_before = False,
@@ -112,7 +114,7 @@ def writedocx(content, font_name = 'Times New Roman', font_size = 12, font_bold 
               before_spacing = 2, after_spacing = 2, line_spacing = 1.5, keep_together = True, keep_with_next = False, page_break_before = False,
               widow_control = False, align = 'left', style = ''):
     paragraph = document.add_paragraph(str(content))
-    insertHR(paragraph)
+    
     #paragraph.style = document.styles.add_style(style, WD_STYLE_TYPE.PARAGRAPH)
     paragraph.style = document.styles['List Number']
     font = paragraph.style.font
@@ -223,5 +225,6 @@ for i in lst:
     else:
         sentence=q+"\n"+"(1) "+a1+"  (2) "+a2+"  (3) "+a3+"  (4) "+a4
     writedocx(sentence)
+    insertHR(paragraph)
 
-document.save('Finalwithpara_border.docx')
+document.save('Finalwithpara_border2.docx')
