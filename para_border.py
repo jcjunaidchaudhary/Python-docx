@@ -47,4 +47,4 @@ bottom.set(qn('w:space'), '1')
 bottom.set(qn('w:color'), 'auto')
 pBdr.append(bottom)
 
-doc.save('para_border.docx')
+doc.save('docx/Pargraph border.docx')

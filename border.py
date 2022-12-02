@@ -17,4 +17,4 @@ for border_name in ('top', 'left', 'bottom', 'right',): # set all borders
     pg_borders.append(border_el) # register single border to border el
 sec_pr.append(pg_borders) # apply border changes to section
 
-doc.save('border.docx')
+doc.save('docx/border.docx')

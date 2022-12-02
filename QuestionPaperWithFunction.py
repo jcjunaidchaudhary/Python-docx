@@ -1,11 +1,12 @@
+from pydoc import doc
 from docx import Document
 from docx.shared import Pt, RGBColor, Inches
 from docx.oxml.xmlchemy import OxmlElement
 from docx.oxml.ns import qn
-from docx.enum.text import WD_PARAGRAPH_ALIGNMENT
-from docx.enum.style import WD_STYLE_TYPE
+from docx.enum.text import WD_PARAGRAPH_ALIGNMENT 
+from docx.enum.section import WD_SECTION
 
-def paperKey(obj):
+def questionpaper(obj):
     document = Document()
 
 # Formating all sections
@@ -19,19 +20,21 @@ def paperKey(obj):
 
 
     #function for Fontstyle
-    obj_styles = document.styles
-    obj_charstyle = obj_styles.add_style('HeadingStyle', WD_STYLE_TYPE.CHARACTER)
-    obj_font = obj_charstyle.font   
-    obj_font.size = Pt(14)
-    obj_font.name = 'Times New Roman'
+    def fontstyle(paragraph, font_name = 'Times New Roman', font_size = 14, font_bold = True, font_italic = False, font_underline = False):
+        font = paragraph.style.font
+        font.name = font_name
+        font.size = Pt(font_size)
+        font.bold = font_bold
+        font.italic = font_italic
+        font.underline = font_underline
 
     #Function for Write Paragrapgh in word
     def writedocx(content, font_name = 'Times New Roman', font_size = 12, font_bold = False, font_italic = False, font_underline = False, color = RGBColor(0, 0, 0),
                 before_spacing = 2, after_spacing = 4, line_spacing = 1.5, keep_together = True, keep_with_next = False, page_break_before = False,
-                widow_control = False, align = 'left', style = 'Normal'):
+                widow_control = False, align = 'left', style = ''):
         paragraph = document.add_paragraph(str(content))
         #paragraph.style = document.styles.add_style(style, WD_STYLE_TYPE.PARAGRAPH)
-        paragraph.style = document.styles[style]
+        paragraph.style = document.styles['List Number']
         font = paragraph.style.font
         font.name = font_name
         font.size = Pt(font_size)
@@ -119,34 +122,25 @@ def paperKey(obj):
     cols.set(qn('w:num'), '1')
 
     paragraph=document.add_heading("Radiance Academy")
-    font = paragraph.style.font
-    font.size=Pt(25)
-    font.underline = True
-
     paragraph.alignment=1
-    # fontstyle(paragraph, font_size=28,font_underline=True)
+    fontstyle(paragraph, font_size=28,font_underline=True)
 
     #header table
     htable=document.add_table(1,3)
 
     htab_cells=htable.rows[0].cells
 
-    ht0=htab_cells[0].add_paragraph()
-    ht0.add_run("Exam : Neet\nDate : 12/2/22",style="HeadingStyle").bold=True
-    # fontstyle(ht0,font_bold=True)
+    ht0=htab_cells[0].add_paragraph("Exam : Neet\nDate : 12/2/22")
+    # fontstyle(ht0)
     ht0.alignment = 0
-    
-    ht1=htab_cells[1].add_paragraph()
-    ht1.add_run("Mock Test\nNEET",style="HeadingStyle").bold=True
 
+    ht1=htab_cells[1].add_paragraph('Mock Test\nNEET')
     ht1.alignment = 1
 
-    ht2=htab_cells[2].add_paragraph()
-    ht2.add_run("Marks : 720\nTime : 3 hour",style="HeadingStyle").bold=True
-
+    ht2=htab_cells[2].add_paragraph("Marks : 720\nTime : 3 hour")
     ht2.alignment = 2
 
-    document.add_paragraph("________________________________________________________________________________________________________________________________________")
+    line=document.add_paragraph("_________________________________________________________________________________")
 
     #creating a main section
     main_section = document.add_section(0)
@@ -156,76 +150,47 @@ def paperKey(obj):
     #creating two column in page
     sectPr = main_section._sectPr
     cols = sectPr.xpath('./w:cols')[0]
-    cols.set(qn('w:num'), '7')
+    cols.set(qn('w:num'), '2')
+
+
+
+    #caliing with other file
+    # f=open('test.txt','r')
+    # for l in f:
+    #     writedocx(l)
     
 
     #calling writedocx function with for loop
-    flag=0
     for i in obj:
-        answer=i["answer"]
-        exp=i["explaination"]
-        if exp:
-            flag=1
-        writedocx("("+answer+")\n", font_bold=True,style='List Number',font_size=13)
-    
+        q=i["question"]
+        a1=i["Option1"]
+        a2=i["option2"]
+        a3=i["optiin3"]
+        a4=i["option4"]
+        if len(a1)>=26 or len(a2)>=26 or len(a3)>=26 or len(a4)>=26:
+            sentence=q+"\n"+"(1) "+a1+"\n(2) "+a2+"\n(3) "+a3+"\n(4) "+a4
+        elif 13<len(a1)<=25 or 13<len(a2)<=25 or 13<len(a3)<=25 or 13<len(a4)<=25:
+            sentence=q+"\n"+"(1) "+a1+"\t(2) "+a2+"\n(3) "+a3+"\t(4) "+a4
+        else:
+            sentence=q+"\n"+"(1) "+a1+"  (2) "+a2+"  (3) "+a3+"  (4) "+a4
+        writedocx(sentence+"\n")
+
     # Calling for Page number in foooter
     footer=document.sections[0]
     add_page_number(footer.footer.paragraphs[0])
-    
-    
-    
-    if flag:
-        document.add_page_break()
 
-        line_section = document.add_section(0)
-        sectPr = line_section._sectPr
-        cols = sectPr.xpath('./w:cols')[0]
-        
-        cols.set(qn('w:num'), '1')
-    
-        paragraph=document.add_paragraph()
-        paragraph.add_run("---------------------Explanation------------------", style = 'HeadingStyle').bold = True
-        paragraph.alignment=1
-    
-    
-
-        #add new section
-        new_section = document.add_section(0)
-        new_section.is_linked_to_previous=False
-        sectPr = new_section._sectPr
-        cols = sectPr.xpath('./w:cols')[0]
-        cols.set(qn('w:num'), '2')
-    
-        lineNo=1
-        for i in obj:
-            answer=i["answer"]
-            exp=i["explaination"]
-            if exp:
-                p = document.add_paragraph()
-                p.add_run(f"{lineNo}.").bold = True
-                p.add_run(f' Answer ({answer})\n')
-                p.add_run('Sol. ').bold = True
-                # writedocx(f"{lineNo}. Answer ({answer})\nSol.")
-                p.add_run(exp)
-                # fontstyle(p,font_bold=False,font_size=12)
-
-                # writedocx(exp,font_size=12.5)
-            else:
-                pass
-            lineNo+=1
-
-
+    #add new section
     new_section = document.add_section(0)
-    new_section.is_linked_to_previous=False
+    # new_section.start_type=WD_SECTION.NEW_PAGE
     sectPr = new_section._sectPr
     cols = sectPr.xpath('./w:cols')[0]
     cols.set(qn('w:num'), '1')
-    endpara=document.add_paragraph()
-    endpara.add_run("---------------End---------------",style="HeadingStyle").bold=True
-    # fontstyle(endpara)
+
+    endpara=document.add_paragraph("---------------Best of Luck---------------")
+    fontstyle(endpara)
     endpara.alignment=1
 
-    document.save('key.docx')
+    document.save('QuestionPaper.docx')
 
 
 
@@ -234,251 +199,272 @@ lst=[{  "question":"The acceleration ‘a’ in m/s²  of a particle is given by
             "Option1":"12 m/s",
             "option2":"18 m/s",
             "optiin3":"27 m/s",
-            "option4":"36 m/s",
-            "answer":"2"  ,
-            "explaination" :"" 
+            "option4":"36 m/s"    
         },
         {  "question":"The work done in an adiabatic change in a gas depends only on.",
             "Option1":"Change is pressure",
             "option2":"Change in volume",
             "optiin3":"change in temprature",
-            "option4":"None of these" ,
-            "answer":"3"   ,
-            "explaination" :"floats with ¼ of its volume above the water level."
+            "option4":"None of these"    
         },
         {  "question":"In the case of constants  and α of β a transistor.",
             "Option1":"1.2",
             "option2":"441",
             "optiin3":"444",
-            "option4":"433"  ,
-            "answer":"1"  ,
-            "explaination" :""
+            "option4":"433"    
         },
         {  "question":"What is your name ",
             "Option1":"Ashraf",
             "option2":"Junaid",
             "optiin3":"Suhail",
-            "option4":"Sadique" ,  
-            "answer":"5" ,
-            "explaination" :""
-        },
-        {  "question":"What is your name ",
-            "Option1":"Ashraf",
-            "option2":"Junaid",
-            "optiin3":"Suhail",
-            "option4":"Sadique" ,  
-            "answer":"5" ,
-            "explaination" :""
+            "option4":"Sadique"    
         },
         {  "question":"Mumbai coding club is initialzed by.",
             "Option1":"Gani bhai",
             "option2":"Majnju Bhai",
             "optiin3":"Uday bhai",
-            "option4":"Babu rao aapte",
-            "answer":"4" ,
-            "explaination" :"floats with ¼ of its volume above the water level."   
+            "option4":"Babu rao aapte"    
         },
         {  "question":"B floats with ¼ of its volume above the water level.",
             "Option1":"hii",
             "option2":"2:3",
             "optiin3":"4:5",
-            "option4":"43",   
-            "answer":"1" ,
-            "explaination" :""
+            "option4":"43"    
         },
         {  "question":"The work done in an adiabatic change in a gas depends only on.",
             "Option1":"Change is pressure",
             "option2":"Change in volume",
             "optiin3":"change in temprature",
-            "option4":"None of these",
-            "answer":"1" ,
-            "explaination" :""   
+            "option4":"None of these"    
         },
         {  "question":"In the case of constants  and α of β a transistor.",
             "Option1":"1.2",
             "option2":"441",
             "optiin3":"444",
-            "option4":"433" ,   
-            "answer":"2",
-            "explaination" :""
+            "option4":"433"    
         },
         {  "question":"What is your name ",
             "Option1":"Ashraf",
             "option2":"Junaid",
             "optiin3":"Suhail",
-            "option4":"Sadique",
-            "answer":"3"    ,
-            "explaination" :"this is beacuse aszhraf is malik with out having ek koadi"
+            "option4":"Sadique"    
         },
         {  "question":"Mumbai coding club is initialzed by.",
             "Option1":"Gani bhai",
             "option2":"Majnju Bhai",
             "optiin3":"Uday bhai",
-            "option4":"Babu rao aapte",
-            "answer":"1"    ,
-            "explaination" :""
+            "option4":"Babu rao aapte"    
         },
         {  "question":"B floats with ¼ of its volume above the water level.",
             "Option1":"hii",
             "option2":"2:3",
             "optiin3":"4:5",
-            "option4":"43",  
-            "answer":"1" ,
-            "explaination" :"my name is chaudhary not khan" 
+            "option4":"43"    
+        },
+        {  "question":"The work done in an adiabatic change in a gas depends only on.",
+            "Option1":"Change is pressure",
+            "option2":"Change in volume",
+            "optiin3":"change in temprature",
+            "option4":"None of these"    
+        },
+        {  "question":"In the case of constants  and α of β a transistor.",
+            "Option1":"1.2",
+            "option2":"441",
+            "optiin3":"444",
+            "option4":"433"    
         },
         {  "question":"What is your name ",
             "Option1":"Ashraf",
             "option2":"Junaid",
             "optiin3":"Suhail",
-            "option4":"Sadique",
-            "answer":"3"    ,
-            "explaination" :"this is beacuse aszhraf is malik with out having ek koadi"
+            "option4":"Sadique"    
         },
         {  "question":"Mumbai coding club is initialzed by.",
             "Option1":"Gani bhai",
             "option2":"Majnju Bhai",
             "optiin3":"Uday bhai",
-            "option4":"Babu rao aapte",
-            "answer":"1"    ,
-            "explaination" :"sssd"
+            "option4":"Babu rao aapte"    
         },
         {  "question":"B floats with ¼ of its volume above the water level.",
             "Option1":"hii",
             "option2":"2:3",
             "optiin3":"4:5",
-            "option4":"43",  
-            "answer":"1" ,
-            "explaination" :"my name is chaudhary not khan" 
+            "option4":"43"    
         },
         {  "question":"What is your name ",
             "Option1":"Ashraf",
             "option2":"Junaid",
             "optiin3":"Suhail",
-            "option4":"Sadique",
-            "answer":"3"    ,
-            "explaination" :""
+            "option4":"Sadique"    
         },
         {  "question":"Mumbai coding club is initialzed by.",
             "Option1":"Gani bhai",
             "option2":"Majnju Bhai",
             "optiin3":"Uday bhai",
-            "option4":"Babu rao aapte",
-            "answer":"1"    ,
-            "explaination" :"sssd"
+            "option4":"Babu rao aapte"    
         },
         {  "question":"B floats with ¼ of its volume above the water level.",
             "Option1":"hii",
             "option2":"2:3",
             "optiin3":"4:5",
-            "option4":"43",  
-            "answer":"1" ,
-            "explaination" :"my name is chaudhary not khan" 
+            "option4":"43"    
+        },
+        {  "question":"The work done in an adiabatic change in a gas depends only on.",
+            "Option1":"Change is pressure",
+            "option2":"Change in volume",
+            "optiin3":"change in temprature",
+            "option4":"None of these"    
+        },
+        {  "question":"In the case of constants  and α of β a transistor.",
+            "Option1":"1.2",
+            "option2":"441",
+            "optiin3":"444",
+            "option4":"433"    
         },
         {  "question":"What is your name ",
             "Option1":"Ashraf",
             "option2":"Junaid",
             "optiin3":"Suhail",
-            "option4":"Sadique",
-            "answer":"3"    ,
-            "explaination" :"this is beacuse aszhraf is malik with out having ek koadi"
+            "option4":"Sadique"    
         },
         {  "question":"Mumbai coding club is initialzed by.",
             "Option1":"Gani bhai",
             "option2":"Majnju Bhai",
             "optiin3":"Uday bhai",
-            "option4":"Babu rao aapte",
-            "answer":"1"    ,
-            "explaination" :"sssd"
+            "option4":"Babu rao aapte"    
         },
         {  "question":"B floats with ¼ of its volume above the water level.",
             "Option1":"hii",
             "option2":"2:3",
             "optiin3":"4:5",
-            "option4":"43",  
-            "answer":"1" ,
-            "explaination" :"" 
+            "option4":"43"    
+        },
+        {  "question":"The work done in an adiabatic change in a gas depends only on.",
+            "Option1":"Change is pressure",
+            "option2":"Change in volume",
+            "optiin3":"change in temprature",
+            "option4":"None of these"    
+        },
+        {  "question":"In the case of constants  and α of β a transistor.",
+            "Option1":"1.2",
+            "option2":"441",
+            "optiin3":"444",
+            "option4":"433"    
         },
         {  "question":"What is your name ",
             "Option1":"Ashraf",
             "option2":"Junaid",
             "optiin3":"Suhail",
-            "option4":"Sadique",
-            "answer":"3"    ,
-            "explaination" :"this is beacuse aszhraf is malik with out having ek koadi"
+            "option4":"Sadique"    
         },
         {  "question":"Mumbai coding club is initialzed by.",
             "Option1":"Gani bhai",
             "option2":"Majnju Bhai",
             "optiin3":"Uday bhai",
-            "option4":"Babu rao aapte",
-            "answer":"1"    ,
-            "explaination" :""
+            "option4":"Babu rao aapte"    
         },
         {  "question":"B floats with ¼ of its volume above the water level.",
             "Option1":"hii",
             "option2":"2:3",
             "optiin3":"4:5",
-            "option4":"43",  
-            "answer":"1" ,
-            "explaination" :"my name is chaudhary not khan" 
+            "option4":"43"    
+        },
+        {  "question":"B floats with ¼ of its volume above the water level.",
+            "Option1":"hii",
+            "option2":"2:3",
+            "optiin3":"4:5",
+            "option4":"43"    
+        },
+        {  "question":"The work done in an adiabatic change in a gas depends only on.",
+            "Option1":"Change is pressure",
+            "option2":"Change in volume",
+            "optiin3":"change in temprature",
+            "option4":"None of these"    
+        },
+        {  "question":"In the case of constants  and α of β a transistor.",
+            "Option1":"1.2",
+            "option2":"441",
+            "optiin3":"444",
+            "option4":"433"    
         },
         {  "question":"What is your name ",
             "Option1":"Ashraf",
             "option2":"Junaid",
             "optiin3":"Suhail",
-            "option4":"Sadique",
-            "answer":"3"    ,
-            "explaination" :"this is beacuse aszhraf is malik with out having ek koadi"
+            "option4":"Sadique"    
         },
         {  "question":"Mumbai coding club is initialzed by.",
             "Option1":"Gani bhai",
             "option2":"Majnju Bhai",
             "optiin3":"Uday bhai",
-            "option4":"Babu rao aapte",
-            "answer":"1"    ,
-            "explaination" :"sssd"
+            "option4":"Babu rao aapte"    
         },
         {  "question":"B floats with ¼ of its volume above the water level.",
             "Option1":"hii",
             "option2":"2:3",
             "optiin3":"4:5",
-            "option4":"43",  
-            "answer":"1" ,
-            "explaination" :"my name is chaudhary not khan" 
+            "option4":"43"    
+        },
+        {  "question":"B floats with ¼ of its volume above the water level.",
+            "Option1":"hii",
+            "option2":"2:3",
+            "optiin3":"4:5",
+            "option4":"43"    
+        },
+        {  "question":"The work done in an adiabatic change in a gas depends only on.",
+            "Option1":"Change is pressure",
+            "option2":"Change in volume",
+            "optiin3":"change in temprature",
+            "option4":"None of these"    
+        },
+        {  "question":"In the case of constants  and α of β a transistor.",
+            "Option1":"1.2",
+            "option2":"441",
+            "optiin3":"444",
+            "option4":"433"    
+        },
+        {  "question":"What is your name ",
+            "Option1":"Ashraf",
+            "option2":"Junaid",
+            "optiin3":"Suhail",
+            "option4":"Sadique"    
+        },
+        {  "question":"Mumbai coding club is initialzed by.",
+            "Option1":"Gani bhai",
+            "option2":"Majnju Bhai",
+            "optiin3":"Uday bhai",
+            "option4":"Babu rao aapte"    
+        },
+        {  "question":"B floats with ¼ of its volume above the water level.",
+            "Option1":"hii",
+            "option2":"2:3",
+            "optiin3":"4:5",
+            "option4":"43"    
+        },
+        {  "question":"B floats with ¼ of its volume above the water level.",
+            "Option1":"hii",
+            "option2":"2:3",
+            "optiin3":"4:5",
+            "option4":"43"    
+        },
+        {  "question":"B floats with ¼ of its volume above the water level.",
+            "Option1":"hii",
+            "option2":"2:3",
+            "optiin3":"4:5",
+            "option4":"43"    
+        },
+        {  "question":" If r  represents the radius of the orbit of a satellite of mass m moving around a planet of mass M, the velocity of the satellite is given by",
+            "Option1":"They are monochromatic ",
+            "option2":"They are highly polarised    ",
+            "optiin3":"They are coherent ",
+            "option4":"They have high degree of parallelism"    
+        },
+        {  "question":"B floats with ¼ of its volume above the water level.",
+            "Option1":"hii",
+            "option2":"2:3",
+            "optiin3":"4:5",
+            "option4":"43"    
         }
-        
-]
 
-# lst=[{"question":"The acceleration ‘a’ in m/s²  of a particle is given by a = 3t²  + 2t + 2 where t is the time. If the particle starts out with a velocity  u = 2m /s  at t = 0, then the velocity at the end of  2 second is.",
-#             "Option1":"12 m/s",
-#             "option2":"18 m/s",
-#             "optiin3":"27 m/s",
-#             "option4":"36 m/s",
-#             "answer":"2"  ,
-#             "explaination" :"" 
-#         },
-#         {  "question":"The work done in an adiabatic change in a gas depends only on.",
-#             "Option1":"Change is pressure",
-#             "option2":"Change in volume",
-#             "optiin3":"change in temprature",
-#             "option4":"None of these" ,
-#             "answer":"3"   ,
-#             "explaination" :""
-#         },
-#         {  "question":"In the case of constants  and α of β a transistor.",
-#             "Option1":"1.2",
-#             "option2":"441",
-#             "optiin3":"444",
-#             "option4":"433"  ,
-#             "answer":"1"  ,
-#             "explaination" :""
-#         },
-#         {  "question":"What is your name ",
-#             "Option1":"Ashraf",
-#             "option2":"Junaid",
-#             "optiin3":"Suhail",
-#             "option4":"Sadique" ,  
-#             "answer":"1" ,
-#             "explaination" :""
-#         }]
-paperKey(lst)
+]
+questionpaper(lst)
