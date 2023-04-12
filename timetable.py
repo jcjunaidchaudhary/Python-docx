@@ -35,12 +35,27 @@ paragraph.alignment=1
 paragraph=document.add_paragraph('"Deaprtment of Information Technology"', style='Intense Quote')
 paragraph.alignment=1
 
-document.add_paragraph(
-    'Semester: III'
-)
-document.add_paragraph(
-   'Room:205/208'
-)
+
+#header table
+htable=document.add_table(1,3)
+
+htab_cells=htable.rows[0].cells
+
+ht0=htab_cells[0].add_paragraph()
+ht0.add_run("Room:205/208")
+# fontstyle(ht0,font_bold=True)
+ht0.alignment = 0
+
+ht1=htab_cells[1].add_paragraph()
+ht1.add_run("Semester: III")
+
+ht1.alignment = 1
+
+ht2=htab_cells[2].add_paragraph()
+ht2.add_run("Date : 12/2/22")
+
+ht2.alignment = 2
+
 
 timetable=[{'time': '9.00am-10.00am  ', 'M': 'BC g VB / CC g ZM', 'T': '--', 'W': 'CCS L ZM', 'Th': '--', 'F': '--'}, {'time': '10.00am-11.00am  ', 'M': 'BDLT L VB', 'T': 'BDLT L VB', 'W': 'EM L AW', 'Th': '--', 'F': 'BC g VB / CC g ZM'}, {'time': '11.00am-12.00am', 'M': 'BDA L AS', 'T': 'BC g VB / CC g ZM', 
 'W': '--', 'Th': 'BDA L AS', 'F': 'BDA L AS'}, {'time': '12.00am-1.00am  ', 'M': '--', 'T': '--', 'W': '--', 'Th': '--', 'F': '--'}, {'time': '2.00am-3.00am  ', 'M': '--', 'T': 'EM L AW', 'W': '--', 'Th': 'CCS L ZM', 'F': 'CCS L ZM'}, {'time': '3.00am-4.00am  ', 'M': 'EM L AW', 'T': 'CCS L ZM', 'W': 'BDLT L VB', 'Th': 'EM L AW', 'F': '--'}]
