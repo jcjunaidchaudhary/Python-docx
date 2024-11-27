@@ -1,7 +1,7 @@
 from docx import Document
 from docx.enum.style import WD_STYLE_TYPE 
 from docx.shared import Pt, RGBColor, Inches
-from docx.oxml.xmlchemy import OxmlElement
+# from docx.oxml.xmlchemy import OxmlElement
 from docx.oxml.ns import qn
 from docx.enum.text import WD_PARAGRAPH_ALIGNMENT 
 from docx.enum.section import WD_SECTION
@@ -64,12 +64,13 @@ def writedocx(content, font_name = 'Times New Roman', font_size = 12, font_bold 
 
 #Function for Footer page Number
 def create_element(name):
-    return OxmlElement(name)
+    return 
 
 def create_attribute(element, name, value):
     element.set(qn(name), value)
 
 def add_page_number(paragraph):
+    return
     paragraph.alignment = WD_PARAGRAPH_ALIGNMENT.RIGHT
 
     page_run = paragraph.add_run()
